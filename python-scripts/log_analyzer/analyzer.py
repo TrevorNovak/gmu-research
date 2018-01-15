@@ -1,5 +1,6 @@
 import re
 from strings import *
+from collections import defaultdict
 
 # Find replication header
 # Read replication until next header
@@ -12,12 +13,13 @@ from strings import *
 # Convert to csv and write to file
 # Repeat
 
-COLUMN_NUMBER = 4 # Optional explicit definition of hardened line column.
+COLUMN_NUMBER = 5 # Optional explicit definition of hardened line column.
 class Analyzer:
-
+    output_string = ""
 
     def __init__(self):
-        self.hardening_plans = {}
+        #self.hardening_plans = defaultdict(tuple)
+        self.hardening_plans = { }
         self.rep_headers_list = []
         self.replication_indicies = []
 
@@ -32,17 +34,70 @@ class Analyzer:
     def parse_section(self):
         pass
 
+    def check_header(self, target, string):
+        myregex = r"=+\s*" + target + r"\s*=+"
+        pattern = re.compile(myregex)
+        return pattern.search(string)
+
     def search_headers(self, target, string):
         myregex = r"=+" + target + r"=+"
         pattern = re.compile(myregex)
         return pattern.finditer(string)
 
-    def determine_plan(self, replication_text, colnum):
-        ln = 0
-        for line in replication_text.splitlines():
-            print(str(ln) + ": " + line)
-            ln += 1
+    def search_columns(self, target, string):
+        myregex = r"" +target
+        pattern = re.compile(myregex)
+        return pattern.search(string)
 
+    def determine_plan(self, replication_text, linecol, hardencol):
+        ln = 0
+        line_num = -1
+        plan = []
+        isReinforced = 0
+        total_initial_tripped = 0
+
+        for line in replication_text.splitlines():
+            line_string = str(line)
+            #print(str(ln) + ": " + line)
+            #ln += 1
+            if self.check_header(TRIP_HEADER, line_string) is not None:
+                break
+            elif self.search_columns(REINFORCE, line_string) is None:
+                #self.extract(line_string)
+                values = line.split()
+                print(values)
+                isReinforced = int(values[hardencol])
+                print("Harden: " + str(isReinforced))
+                line_num = int(values[linecol])
+                if isReinforced == 1:
+                    plan.append(line_num)
+                else:
+                    total_initial_tripped += 1
+            else:
+                #parse header
+                pass
+        print(plan, total_initial_tripped)
+        plan_key = tuple(plan)
+        print(plan_key)
+
+        if(plan_key in self.hardening_plans):
+            temp = self.hardening_plans[plan_key]
+            temp += 1
+            self.hardening_plans[plan_key] = temp
+        else:
+            self.hardening_plans[plan_key] = 1
+        print(self.hardening_plans)
+
+        return plan
+
+    def extract(self, line):
+        pass
+
+    def extract_line_num(self, column, line):
+        pass
+
+    def extract_hardening_value(self, column, line):
+        pass
 
     def build_rep_header_indices(self, log, header):
         headers = self.search_headers(header, log)
@@ -71,8 +126,8 @@ class Analyzer:
             #print(self.rep_headers_list[index+1][0])
 
     def analyze_replication(self, replication_text):
-        self.determine_plan(replication_text, COLUMN_NUMBER-1)
-        pass
+        plans = self.determine_plan(replication_text, 0, COLUMN_NUMBER-1)
+        
 
     def read_file(self, filename):
         """
@@ -84,6 +139,7 @@ class Analyzer:
             self.build_rep_header_indices(log_string, REP_HEADER)
             self.build_replication_indices()
             replication_text = log_string[self.replication_indicies[0][0] : self.replication_indicies[0][1]]
+            print(replication_text)
             self.analyze_replication(replication_text)
             #replication = log_string[head_start : head_end]
             #print(str(line))
