@@ -55,13 +55,14 @@ class Analyzer:
         plan = []
         isReinforced = 0
         total_initial_tripped = 0
+        cursection = 1
 
         for line in replication_text.splitlines():
             line_string = str(line)
             #print(str(ln) + ": " + line)
             #ln += 1
             if self.check_header(TRIP_HEADER, line_string) is not None:
-                break
+
             elif self.search_columns(REINFORCE, line_string) is None:
                 #self.extract(line_string)
                 values = line.split()
@@ -127,7 +128,7 @@ class Analyzer:
 
     def analyze_replication(self, replication_text):
         plans = self.determine_plan(replication_text, 0, COLUMN_NUMBER-1)
-        
+
 
     def read_file(self, filename):
         """
