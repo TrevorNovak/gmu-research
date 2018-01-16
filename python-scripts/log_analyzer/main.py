@@ -27,7 +27,7 @@ def parse_command():
 
 def print_summary(logs, outfiles, flag):
     width = 38
-    print("********** ANALYSIS SUMMARY **********")
+    print("\n\n********** ANALYSIS SUMMARY **********")
 
     print("\nResult of Analysis: " + flag)
     print("\nLogs that were analyed: ")
