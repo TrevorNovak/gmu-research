@@ -35,9 +35,9 @@ class Processor:
                 self.current_section = self.get_section(token)
                 #print(self.current_section)
                 if self.current_section == 1:
-                    print("PLANS VAL: " + str(self.plans))
+                    #print("PLANS VAL: " + str(self.plans))
                     if len(self.plans) > 0:
-                        print("PLANS VAL AFTER: " + str(self.plans))
+                        #print("PLANS VAL AFTER: " + str(self.plans))
                         self.store_and_reset()
             elif token.type == 'COLUMN':
                 pass
@@ -52,14 +52,14 @@ class Processor:
                     if self.current_token_number > self.TOTAL_COL:
                         self.current_token_number = 1
                     if self.current_token_number == 1:               # LineNum token
-                        print("FIRST TOKEN")
+                        #print("FIRST TOKEN")
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
                     elif self.current_token_number == 5:             # Check if Hardened
-                        print("FIFTH TOKEN")
+                        #print("FIFTH TOKEN")
                         self.isReinforced = int(token.value)
-                        print("REINFOCED: " + str(self.isReinforced))
-                        print("CURR LINE: " + str(self.current_line_number))
+                        #print("REINFOCED: " + str(self.isReinforced))
+                        #print("CURR LINE: " + str(self.current_line_number))
                         if self.isReinforced == 1:                   # If Line Hardened
                             self.plans.append(self.current_line_number)   # Add to plan
                             print(self.plans)

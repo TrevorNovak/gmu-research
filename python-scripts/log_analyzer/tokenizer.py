@@ -9,7 +9,6 @@ class Tokenizer:
         self.Token = collections.namedtuple('Token', ['type', 'value', 'line', 'start', 'end'])
 
     def tokenize(self, text):
-        #keywords = {'IF', 'THEN', 'ENDIF', 'FOR', 'NEXT', 'GOSUB', 'RETURN'}
         token_specification = [
             ('HEADER',    r'=+\s*[a-zA-Z ]+\s*=+'),     # Header: start of a section.
             ('COLUMN',    r'[a-zA-Z ]+'),               # Column: data columns.
@@ -41,11 +40,3 @@ class Tokenizer:
                 else:
                     column = mo.start() - line_start
                     yield self.Token(kind, value, line_num, start, end)
-
-
-
-
-#statements = read("cas_results_5.txt")
-#process(tokenize(statements))
-# for token in tokenize(statements):
-#     print(token)
