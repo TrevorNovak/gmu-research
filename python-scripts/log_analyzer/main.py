@@ -26,6 +26,7 @@ def parse_command():
                             help='set the input file. [Default is input.txt]')
 
 def print_summary(logs, outfiles, flag):
+    width = 38
     print("********** ANALYSIS SUMMARY **********")
 
     print("\nResult of Analysis: " + flag)
@@ -42,7 +43,10 @@ def print_summary(logs, outfiles, flag):
         print(str(count) + ":  "  + str(outfile))
         count += 1
 
-    print("\n**************************************")
+    print("\n", end="")
+    for i in range(width):
+        print("*", end="")
+    print("\n")
 
 def main():
     outfiles = ["results.csv"]
