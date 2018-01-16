@@ -26,16 +26,18 @@ def parse_command():
                             help='set the input file. [Default is input.txt]')
 
 def main():
+    filename = "results.csv"
     myanalyzer = Analyzer()
     text = ""
 
     logs = glob.glob("*.txt")               # Grab list of .txt files in directory
     logs.sort()
-    print(logs)
+    #print(logs)
     for log in logs:                        # Check for output logs
         if re.match("[a-zA-Z _]+_\d.txt", log):
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
     myanalyzer.run(text)
+    print("The operation was successful. Please check the output file " + filename + " for analysis.")
 
 main()

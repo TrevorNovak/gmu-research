@@ -13,6 +13,5 @@ class Analyzer:
             return str(log)
 
     def run(self, text):
-        print("RUN")
         token_collection = self.tokenizer.tokenize(text)
         self.processor.process(token_collection)

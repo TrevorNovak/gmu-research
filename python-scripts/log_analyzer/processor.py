@@ -26,7 +26,7 @@ class Processor:
 
         for token in token_collection:
             if token.type == 'HEADER':
-                print("Header: ")
+                #print("Header: ")
                 #self.current_token_number = 1
                 #self.current_line_number = -1
                 # self.total_initial_tripped = 0
@@ -62,7 +62,7 @@ class Processor:
                         #print("CURR LINE: " + str(self.current_line_number))
                         if self.isReinforced == 1:                   # If Line Hardened
                             self.plans.append(self.current_line_number)   # Add to plan
-                            print(self.plans)
+                            #print(self.plans)
                         else:
                             self.total_initial_tripped += 1          # Otherwise failed
                         self.current_token_number += 1
@@ -76,7 +76,7 @@ class Processor:
                         self.total_tripped += 1
                 # Section 3
                 elif self.current_section == 3:
-                    print(token)
+                    #print(token)
                     if self.current_token_number > 4:
                         self.current_token_number = 1
                     if self.current_token_number == 4:
@@ -94,7 +94,7 @@ class Processor:
         self.store_and_reset()
 
         self.write_to_csv("results.csv")
-        print(self.csv_rows)
+        #print(self.csv_rows)
 
     def store_and_reset(self):
         plan_key = self.add_plan(self.plans)
@@ -109,18 +109,23 @@ class Processor:
         self.plans = [ ]
 
     def add_to_csvrows(self, replication_index):
-        print("PLANS: " + str(self.plans))
+        #print("PLANS: " + str(self.plans))
         self.csv_rows.append([str(self.plans[0]),str(self.total_initial_tripped),str(self.total_tripped),str(self.total_shedding_load),str(self.total_tripped_generators),str(replication_index)])
 
     def write_to_csv(self, filename):
         with open(filename, 'w') as csvfile:
             filewriter = csv.writer(csvfile)
+            column_header = self.build_csv_header()
+            filewriter.writerow(column_header)
             for row in self.csv_rows:
                 filewriter.writerow(row)
 
+    def build_csv_header(self):
+        return ['LineNum','Total Initial Tripped Lines','Total Tripped Lines','Total Shedding Load Amount','Total Tripped Generators','Replication Index']
+
     def add_plan(self, plan):
         plan_key = tuple(plan)
-        print(plan_key)
+        #print(plan_key)
 
         if(plan_key in self.hardening_plans):
             temp = self.hardening_plans[plan_key]
@@ -128,7 +133,7 @@ class Processor:
             self.hardening_plans[plan_key] = temp
         else:
             self.hardening_plans[plan_key] = 1
-        print(self.hardening_plans)
+        #print(self.hardening_plans)
         return plan_key
 
     def get_section(self, token):
@@ -136,5 +141,5 @@ class Processor:
         line = str(token.value)
         section_text = re.sub(myregex, '', line)
         section_text = section_text.strip()
-        print(section_text)
+        #print(section_text)
         return section_table[section_text]
