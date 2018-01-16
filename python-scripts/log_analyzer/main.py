@@ -25,8 +25,27 @@ def parse_command():
         parser.add_argument('-i', nargs='?',
                             help='set the input file. [Default is input.txt]')
 
+def print_summary(logs, outfiles, flag):
+    print("********** ANALYSIS SUMMARY **********")
+
+    print("\nResult of Analysis: " + flag)
+    print("\nLogs that were analyed: ")
+
+    count = 1
+    for log in logs:
+        print(str(count) + ":  " + str(log))
+        count += 1
+
+    count = 1
+    print("\nOutput File(s): ")
+    for outfile in outfiles:
+        print(str(count) + ":  "  + str(outfile))
+        count += 1
+
+    print("\n**************************************")
+
 def main():
-    filename = "results.csv"
+    outfiles = ["results.csv"]
     myanalyzer = Analyzer()
     text = ""
 
@@ -38,6 +57,6 @@ def main():
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
     myanalyzer.run(text)
-    print("The operation was successful. Please check the output file " + filename + " for analysis.")
+    print_summary(logs, outfiles, 'SUCCESS')
 
 main()
