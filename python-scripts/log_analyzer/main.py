@@ -9,7 +9,7 @@ def parse_command():
 
     if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Generate new branch file.')
-        parser.add_argument('-o', type=str, nargs='?', default='results.csv',
+        parser.add_argument('-o', type=str, nargs='?', default='output.csv',
                             help='Provide an output file. Default is results.csv')
         parser.add_argument('-r', type=int, nargs=2,
                             help='Provide a range of files to process. E.g. "1 10" Default searches current directory for all "filename_#.txt" files')
@@ -84,3 +84,5 @@ def main(args):
         print_summary(logs, outfiles, 'FAILURE')
 
 parse_command()
+
+#Elapsed time is 154.527286 seconds.
