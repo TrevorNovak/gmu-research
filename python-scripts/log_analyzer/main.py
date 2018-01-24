@@ -84,5 +84,3 @@ def main(args):
         print_summary(logs, outfiles, 'FAILURE')
 
 parse_command()
-
-#Elapsed time is 154.527286 seconds.
