@@ -18,13 +18,16 @@ class Processor:
         self.isReinforced = -1
         self.total_shedding_load = 0.0
         self.total_tripped_generators = 0
+        self.plan_length = 0
         self.hardening_plans = { }
         self.csv_rows = []
         self.plans = [ ]
 
-    def process(self, token_collection):
+    def process(self, token_collection, filename, flag):
 
         for token in token_collection:
+            if flag:
+                print(token)
             if token.type == 'HEADER':
                 #print("Header: ")
                 #self.current_token_number = 1
@@ -93,11 +96,13 @@ class Processor:
 
         self.store_and_reset()
 
-        self.write_to_csv("results.csv")
+        self.write_to_csv(filename)
         #print(self.csv_rows)
 
     def store_and_reset(self):
         plan_key = self.add_plan(self.plans)
+        if self.plan_length < len(plan_key):
+            self.plan_length = len(plan_key)
         self.add_to_csvrows(self.hardening_plans[plan_key])
         self.total_initial_tripped = 0
         self.total_tripped = 0
@@ -110,7 +115,17 @@ class Processor:
 
     def add_to_csvrows(self, replication_index):
         #print("PLANS: " + str(self.plans))
-        self.csv_rows.append([str(self.plans[0]),str(self.total_initial_tripped),str(self.total_tripped),str(self.total_shedding_load),str(self.total_tripped_generators),str(replication_index)])
+        row = []
+        for hline in self.plans:
+            row.append(hline)
+
+        row.append(str(self.total_initial_tripped))
+        row.append(str(self.total_tripped))
+        row.append(str(self.total_shedding_load))
+        row.append(str(self.total_tripped_generators))
+        row.append(str(replication_index))
+
+        self.csv_rows.append(row)
 
     def write_to_csv(self, filename):
         with open(filename, 'w') as csvfile:
@@ -121,7 +136,17 @@ class Processor:
                 filewriter.writerow(row)
 
     def build_csv_header(self):
-        return ['LineNum','Total Initial Tripped Lines','Total Tripped Lines','Total Shedding Load Amount','Total Tripped Generators','Replication Index']
+        col_list = []
+        for i in range(self.plan_length):
+            col_list.append('LineNum')
+
+        col_list.append('Total Initial Tripped Lines')
+        col_list.append('Total Tripped Lines')
+        col_list.append('Total Shedding Load Amount')
+        col_list.append('Total Tripped Generators')
+        col_list.append('Replication Index')
+
+        return col_list
 
     def add_plan(self, plan):
         plan_key = tuple(plan)

@@ -6,36 +6,35 @@ import glob
 
 
 def parse_command():
-    """ NOT CURRENTLY IMPLEMENTED """
 
     if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Generate new branch file.')
-        parser.add_argument('-b', type=int, nargs='?', default=31,
-                            help='set number of branches for this simulation. [Default is 31.]')
-        parser.add_argument('-l', type=float, nargs='?', default=.05,
-                            help='set the probabilty for random selection of hardened lines for this simulation. [Default is randint(0, 1)]')
-        parser.add_argument('-w', type=float, nargs='?', default=.05,
-                            help='set the probability for random selection of line located in weather zone for this simulation. [Default is randint(0, 1)]')
-        parser.add_argument('-f', type=float, nargs='?', default=.05,
-                            help='set the probability for random selection of failure rates for each branch for this simulation. [Default is uniform(0, 1)]')
-        parser.add_argument('-fr', type=float, nargs='+', default=[0, 1],
-                            help='set the range for random number generation of failure rates. [Default is range(0, 1)')
-        parser.add_argument('-o', nargs='?', default="data.txt",
-                            help='set the output file. [Default is data.txt]')
-        parser.add_argument('-i', nargs='?',
-                            help='set the input file. [Default is input.txt]')
+        parser.add_argument('-o', type=str, nargs='?', default='results.csv',
+                            help='Provide an output file. Default is results.csv')
+        parser.add_argument('-r', type=int, nargs=2,
+                            help='Provide a range of files to process. E.g. "1 10" Default searches current directory for all "filename_#.txt" files')
+        parser.add_argument('-l', type=str, nargs='?',
+                            help='Provide a list of input files to analyze. Default searches current directory for all "filename_#.txt" files')
+        parser.add_argument('-v', type=int, nargs=1, default=0,
+                            help='Turns verbose output on. Prints all generated tokens.')
+
+        args = parser.parse_args(sys.argv[1:])
+        main(args)
 
 def print_summary(logs, outfiles, flag):
     width = 38
     print("\n\n********** ANALYSIS SUMMARY **********")
 
     print("\nResult of Analysis: " + flag)
-    print("\nLogs that were analyed: ")
 
     count = 1
-    for log in logs:
-        print(str(count) + ":  " + str(log))
-        count += 1
+    if logs:
+        print("\nLogs that were analyed: ")
+        for log in logs:
+            print(str(count) + ":  " + str(log))
+            count += 1
+    else:
+        print("\nNo logs were found and analyzed based on input parameters.")
 
     count = 1
     print("\nOutput File(s): ")
@@ -48,19 +47,40 @@ def print_summary(logs, outfiles, flag):
         print("*", end="")
     print("\n")
 
-def main():
-    outfiles = ["results.csv"]
+def main(args):
+    outfiles = [args.o]
     myanalyzer = Analyzer()
     text = ""
+    logs = []
 
-    logs = glob.glob("*.txt")               # Grab list of .txt files in directory
-    logs.sort()
-    #print(logs)
-    for log in logs:                        # Check for output logs
-        if re.match("[a-zA-Z _]+_\d.txt", log):
+    temp_logs = [log for log in glob.glob("*.txt") if re.match('[a-zA-Z _]+_[0-9]+.txt', str(log))]
+    temp_logs.sort()
+
+    if args.r:
+        start = args.r[0]
+        end = args.r[1]+1
+        i = start
+        for log in temp_logs:
+            for i in range(start, end):
+                if re.match('[a-zA-Z _]+_'+str(i)+'.txt', str(log)):
+                    logs.append(log)
+    elif args.l:
+        numbers = args.l.split()
+        for log in temp_logs:
+            for number in numbers:
+                if re.match('[a-zA-Z _]+_'+number+'.txt', str(log)):
+                    logs.append(log)
+    else:
+        logs = temp_logs
+
+    if logs:
+        for log in logs:
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
-    myanalyzer.run(text)
-    print_summary(logs, outfiles, 'SUCCESS')
+    if logs and len(outfiles) == 1:
+        myanalyzer.run(text, outfiles[0], args.v)
+        print_summary(logs, outfiles, 'SUCCESS')
+    else:
+        print_summary(logs, outfiles, 'FAILURE')
 
-main()
+parse_command()
