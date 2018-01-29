@@ -42,4 +42,6 @@ Or for a single file
 
 In order to specify a list simply use the `-l` argument followed by the list of file numbers, separated by a space and wrapped in single or double quotation marks.
 
+#### Example:
+
 `python3 main.py -l "1 3 5 129"`
