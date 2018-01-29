@@ -17,11 +17,11 @@ Verbose mode is turned on using the `-v` argument followed by an integer which d
 
 2. **Output File**: 
 
-The default output file is *output.csv*, however, you can specify an output file by using the `-o` argument followed by the file name inside either single or double quotations.
+The default output file is *output.csv*, however, you can specify an output file by using the `-o` argument followed by the file name.
 
 #### Example:
 
-`python3 main.py -o "newoutputfile.csv"`
+`python3 main.py -o newoutputfile.csv`
 
 3. **Input File**: 
 
