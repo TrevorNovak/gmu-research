@@ -27,7 +27,7 @@ The default output file is *output.csv*, however, you can specify an output file
 
 The default input method is to scan the directory of the program and read all files which match the format *filename_#.txt*. However, there are two additional ways to specify file inputs, either as a range or a list.
 
-a. **Range**
+     -a. **Range**
 
 In order to specify a range simply use the `-r` argument followed by two integers specifying the range, inclusively. 
 
