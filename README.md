@@ -36,6 +36,7 @@ In order to specify a range simply use the `-r` argument followed by two integer
 `python3 main.py -r 1 10`
 
 Or for a single file
+
 `python3 main.py -r 10 10`
 
    - **List**
