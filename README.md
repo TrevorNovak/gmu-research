@@ -11,6 +11,6 @@ A code repository for Dr. Jie Xu's Power Systems Optimization Research.
 
 Verbose mode is turned on using the `-v` argument followed by an integer which determines the verbosity level. Currently, 0 turns verbose output off, while 1 simply prints each token. There are plans to add additional verbosity levels, primarily used to check processing against output and for debugging.
 
-### Example:
+#### Example:
 
 `python3 main.py -v 1`
