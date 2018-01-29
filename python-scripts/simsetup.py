@@ -96,13 +96,10 @@ def write_file(args):
     print("\nFile " + fn + " has been generated successfully!\n")
     print("Number of Branches: " + str(num_branches) + "\n")
 
-<<<<<<< HEAD
-=======
 def calculate():
     answer = 0
     for i in range(100):
         answer += i
         print(answer)
 
->>>>>>> develop
 parse_command()

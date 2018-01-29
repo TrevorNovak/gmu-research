@@ -24,24 +24,17 @@ class Processor:
         self.plans = [ ]
 
     def process(self, token_collection, filename, flag):
+        current_replication = 0
 
         for token in token_collection:
             if flag:
                 print(token)
             if token.type == 'HEADER':
-                #print("Header: ")
-                #self.current_token_number = 1
-                #self.current_line_number = -1
-                # self.total_initial_tripped = 0
-                # self.total_tripped = 0
                 self.isReinforced = -1
                 self.current_section = self.get_section(token)
-                #print(self.current_section)
-                if self.current_section == 1:
-                    #print("PLANS VAL: " + str(self.plans))
+                if self.current_section == 5:
                     if len(self.plans) > 0:
-                        #print("PLANS VAL AFTER: " + str(self.plans))
-                        self.store_and_reset()
+                        self.store_and_reset(current_replication)
             elif token.type == 'COLUMN':
                 pass
             elif token.type == 'DATA':
@@ -55,17 +48,12 @@ class Processor:
                     if self.current_token_number > self.TOTAL_COL:
                         self.current_token_number = 1
                     if self.current_token_number == 1:               # LineNum token
-                        #print("FIRST TOKEN")
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
                     elif self.current_token_number == 5:             # Check if Hardened
-                        #print("FIFTH TOKEN")
                         self.isReinforced = int(token.value)
-                        #print("REINFOCED: " + str(self.isReinforced))
-                        #print("CURR LINE: " + str(self.current_line_number))
                         if self.isReinforced == 1:                   # If Line Hardened
                             self.plans.append(self.current_line_number)   # Add to plan
-                            #print(self.plans)
                         else:
                             self.total_initial_tripped += 1          # Otherwise failed
                         self.current_token_number += 1
@@ -79,28 +67,26 @@ class Processor:
                         self.total_tripped += 1
                 # Section 3
                 elif self.current_section == 3:
-                    #print(token)
                     if self.current_token_number > 4:
                         self.current_token_number = 1
                     if self.current_token_number == 4:
                         self.total_shedding_load += float(token.value)
-                        #print(total_shedding_load)
                     self.current_token_number += 1
                 # Section 4
                 elif self.current_section == 4:
                     self.total_tripped_generators += 1
-                    #print(self.total_tripped_generators)
-
+                # Section 5
+                elif self.current_section == 5:
+                    current_replication = int(token.value)
             else:
                 print("Nothing")
 
-        self.store_and_reset()
+        self.store_and_reset(current_replication)
 
         self.write_to_csv(filename)
-        #print(self.csv_rows)
 
-    def store_and_reset(self):
-        plan_key = self.add_plan(self.plans)
+    def store_and_reset(self, replication):
+        plan_key = self.add_plan(self.plans, replication)
         if self.plan_length < len(plan_key):
             self.plan_length = len(plan_key)
         self.add_to_csvrows(self.hardening_plans[plan_key])
@@ -114,7 +100,6 @@ class Processor:
         self.plans = [ ]
 
     def add_to_csvrows(self, replication_index):
-        #print("PLANS: " + str(self.plans))
         row = []
         for hline in self.plans:
             row.append(hline)
@@ -148,17 +133,15 @@ class Processor:
 
         return col_list
 
-    def add_plan(self, plan):
+    def add_plan(self, plan, replication):
         plan_key = tuple(plan)
-        #print(plan_key)
 
-        if(plan_key in self.hardening_plans):
-            temp = self.hardening_plans[plan_key]
-            temp += 1
-            self.hardening_plans[plan_key] = temp
-        else:
-            self.hardening_plans[plan_key] = 1
-        #print(self.hardening_plans)
+        # if(plan_key in self.hardening_plans):
+        #     temp = self.hardening_plans[plan_key]
+        #     temp = replication
+        #     self.hardening_plans[plan_key] = temp
+        # else:
+        self.hardening_plans[plan_key] = replication
         return plan_key
 
     def get_section(self, token):
