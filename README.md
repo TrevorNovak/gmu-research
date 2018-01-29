@@ -25,9 +25,9 @@ The default output file is *output.csv*, however, you can specify an output file
 
 3. **Input File**: 
 
-The default input method is to scan the directory of the program and read all files which made the format *filename_#.txt*. However, there are two additional ways to specify different file inputs, either as a range or a list.
+The default input method is to scan the directory of the program and read all files which match the format *filename_#.txt*. However, there are two additional ways to specify file inputs, either as a range or a list.
 
-- **Range**
+a. **Range**
 
 In order to specify a range simply use the `-r` argument followed by two integers specifying the range, inclusively. 
 
@@ -38,7 +38,7 @@ In order to specify a range simply use the `-r` argument followed by two integer
 Or for a single file
 `python3 main.py -r 10 10`
 
-- **List**
+b. **List**
 
 In order to specify a list simply use the `-l` argument followed by the list of file numbers, separated by a space and wrapped in single or double quotation marks.
 
