@@ -49,6 +49,7 @@ def print_summary(logs, outfiles, flag):
 
 def main(args):
     outfiles = [args.o]
+    infile = "linemap.csv"
     myanalyzer = Analyzer()
     text = ""
     logs = []
@@ -78,7 +79,7 @@ def main(args):
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
     if logs and len(outfiles) == 1:
-        myanalyzer.run(text, outfiles[0], args.v)
+        myanalyzer.run(text, outfiles[0], infile, args.v)
         print_summary(logs, outfiles, 'SUCCESS')
     else:
         print_summary(logs, outfiles, 'FAILURE')
