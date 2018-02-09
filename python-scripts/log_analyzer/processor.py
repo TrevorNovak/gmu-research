@@ -24,6 +24,7 @@ class Processor:
         self.total_replications = 0
         self.hardening_plans = { }
         self.line_map = { }
+        self.matrix_map = { }
         self.csv_rows = []
         self.plans = [ ]
         self.encoded_matrix = [ ]
@@ -39,7 +40,6 @@ class Processor:
             self.build_line_map(infile)
             #self.print_line_map()
 
-
         if flag2 == 1:
             self.first_process(token_collection_list, outfile, flag1)
             self.matrix_process(token_collection_list)
@@ -54,8 +54,8 @@ class Processor:
                 temp_key.append(line[2])                # Get "To" bus
                 key = tuple(temp_key)                   # Use "From" and "To" as hashmap key
                 value = line[0]                         # Use line num as value in hashmap
-                if key in self.line_map:
-                    print("Current Line: " + str(value) +  " Line: " + str(self.line_map[key])+ " Key: " + str(key))
+                # if key in self.line_map:
+                #     print("Current Line: " + str(value) +  " Line: " + str(self.line_map[key])+ " Key: " + str(key))
 
                 self.line_map[key] = value
                 temp_key = []
@@ -71,11 +71,7 @@ class Processor:
             if flag1:
                 print(token)
             if token.type == 'HEADER':
-                self.isReinforced = -1
-                self.current_section = self.get_section(token)
-                if self.current_section == 5:
-                    if len(self.plans) > 0:
-                        self.store_and_reset(current_replication)
+                self.process_header(token, current_replication)
             elif token.type == 'COLUMN':
                 pass
             elif token.type == 'DATA':
@@ -86,64 +82,91 @@ class Processor:
 
                 # Section 1
                 if self.current_section == 1:                        # Initial Tripped
-                    if self.current_token_number > self.TOTAL_COL:
-                        self.current_token_number = 1
-                    if self.current_token_number == 1:               # LineNum token
-                        self.current_line_number = int(token.value)  # Save LineNum
-                        self.current_token_number += 1
-                    elif self.current_token_number == 5:             # Check if Hardened
-                        self.isReinforced = int(token.value)
-                        if self.isReinforced == 1:                   # If Line Hardened
-                            self.plans.append(self.current_line_number)   # Add to plan
-                        else:
-                            self.total_initial_tripped += 1          # Otherwise failed
-                        self.current_token_number += 1
-                    else:
-                        self.current_token_number += 1               # No match
+                    self.process_section_one(token)
                 # Section 2
                 elif self.current_section == 2:
-                    next_line = int(token.line)
-                    if next_line > self.curr_line:
-                        self.curr_line = next_line
-                        self.total_tripped += 1
+                    self.process_section_two(token)
                 # Section 3
                 elif self.current_section == 3:
-                    if self.current_token_number > 4:
-                        self.current_token_number = 1
-                    if self.current_token_number == 4:
-                        self.total_shedding_load += float(token.value)
-                    self.current_token_number += 1
+                    self.process_section_three(token)
                 # Section 4
                 elif self.current_section == 4:
-                    self.total_tripped_generators += 1
+                    self.process_section_four()
                 # Section 5
                 elif self.current_section == 5:
-                    current_replication = int(token.value)
-                    if current_replication > self.total_replications:
-                        self.total_replications = current_replication
+                    current_replication = self.process_section_five(token)
             else:
                 print("Nothing")
 
         self.store_and_reset(current_replication)
 
-        print(self.total_replications)
+        #print(self.total_replications)
         #print(len(self.line_map))
         self.write_to_csv(filename)
 
+    def process_header(self, token, current_replication):
+        self.isReinforced = -1
+        self.current_section = self.get_section(token)
+        if self.current_section == 5:
+            if len(self.plans) > 0:
+                self.store_and_reset(current_replication)
+
+    def process_section_one(self, token):
+        if self.current_token_number > self.TOTAL_COL:
+            self.current_token_number = 1
+        if self.current_token_number == 1:               # LineNum token
+            self.current_line_number = int(token.value)  # Save LineNum
+            self.current_token_number += 1
+        elif self.current_token_number == 5:             # Check if Hardened
+            self.isReinforced = int(token.value)
+            if self.isReinforced == 1:                   # If Line Hardened
+                self.plans.append(self.current_line_number)   # Add to plan
+            else:
+                self.total_initial_tripped += 1          # Otherwise failed
+            self.current_token_number += 1
+        else:
+            self.current_token_number += 1               # No match
+
+    def process_section_two(self, token):
+        next_line = int(token.line)
+        if next_line > self.curr_line:
+            self.curr_line = next_line
+            self.total_tripped += 1
+
+    def process_section_three(self, token):
+        if self.current_token_number > 4:
+            self.current_token_number = 1
+        if self.current_token_number == 4:
+            self.total_shedding_load += float(token.value)
+        self.current_token_number += 1
+
+    def process_section_four(self):
+        self.total_tripped_generators += 1
+
+    def process_section_five(self, token):
+        current_replication = int(token.value)
+        if current_replication > self.total_replications:
+            self.total_replications = current_replication
+        return current_replication
+
     def matrix_process(self,token_collection):
-        numlines = len(self.line_map)
+        #numlines = len(self.line_map)
+        self.build_matrix_map()
+        numlines = 233
         current_replication = 0
-        self.build_matrix(self.total_replications, numlines)
-        HARDEN_STATUS = 1
-        INITIAL_TRIPPED = 2
-        TOTAL_TRIPPED = 4
-        HARDEN_AND_INITIAL_TRIPPED = HARDEN_STATUS + INITIAL_TRIPPED
-        HARDENED_AND_TOTAL_TRIPPED = HARDEN_STATUS + TOTAL_TRIPPED
-        TOTAL_AND_INITIAL_TRIPPED = TOTAL_TRIPPED + INITIAL_TRIPPED
-        TOTAL_INITIAL_AND_HARDENED = HARDEN_STATUS + INITIAL_TRIPPED + TOTAL_TRIPPED
+        rep_count = 0
+        current_plan = 0
+        keys = list(self.hardening_plans.keys())
+        #print("KEYS")
+        #print(keys)
+        row = len(self.hardening_plans)*self.total_replications
+        col = 3*numlines
+        #print("Row: " + str(row) + " Col: " + str(col) + "Hard: " + str(len(self.hardening_plans)))
+        #print(self.hardening_plans)
+        self.build_matrix(row, col)
 
+        count = 1
 
-        print("PRIOR")
         for token in token_collection:
             #print("HERE")
             #print(token)
@@ -152,6 +175,11 @@ class Processor:
                 self.current_section = self.get_section(token)
                 if self.current_section == 5:
                     self.reset()
+                    rep_count += 1
+                    if rep_count == self.total_replications:
+                        current_plan += 1
+                        rep_count = 0
+                        #print(current_plan)
             elif token.type == 'COLUMN':
                 pass
             elif token.type == 'DATA':
@@ -167,47 +195,38 @@ class Processor:
                     if self.current_token_number == 1:               # LineNum token
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
-                        print("CURRENT REP: " + str(current_replication))
-                        print("CURRENT LINE: " + str(self.current_line_number))
-                        print("CURRENT VAL: " + str(self.encoded_matrix[current_replication-1][self.current_line_number-1]))
-                        print("=================")
-                        # if self.encoded_matrix[current_replication-1][self.current_line_number-1] == HARDEN_STATUS:
-                        #     self.update_matrix(self.encoded_matrix, current_replication-1, self.current_line_number-1, HARDEN_AND_INITIAL_TRIPPED)
-                        if self.encoded_matrix[current_replication-1][self.current_line_number-1] == 0:
-                            self.update_matrix(self.encoded_matrix, current_replication-1, self.current_line_number-1, INITIAL_TRIPPED)
+                        key = tuple([keys[current_plan-1], current_replication])
+                        #print(self.current_line_number+numlines)
+                        self.update_matrix(self.matrix_map[key], self.current_line_number+numlines, 1)
                     elif self.current_token_number == 5:             # Check if Hardened
                         self.isReinforced = int(token.value)
-                        if self.isReinforced == 1:                     # If Line Hardened
-                            if self.encoded_matrix[current_replication-1][self.current_line_number-1] == INITIAL_TRIPPED:
-                                self.update_matrix(self.encoded_matrix, current_replication-1, self.current_line_number-1, HARDEN_AND_INITIAL_TRIPPED)
-                            else:
-                                self.update_matrix(self.encoded_matrix, current_replication-1, self.current_line_number-1, HARDEN_STATUS)
-                        else:
-                            self.total_initial_tripped += 1          # Otherwise failed
+                        if self.isReinforced == 1:
+                            line = 0
+                            key = tuple([keys[current_plan-1], current_replication])
+                            #print(self.matrix_map[key])
+                            self.update_matrix(self.matrix_map[key], self.current_line_number-1, 1)
                         self.current_token_number += 1
+
                     else:
                         self.current_token_number += 1               # No match
                 # Section 2
                 elif self.current_section == 2:
-                    next_line = int(token.line)
-                    if next_line > self.curr_line:
-                        self.curr_line = next_line
-                        self.total_tripped += 1
-                #     # Section 3
-                # elif self.current_section == 3:
-                #     if self.current_token_number > 4:
-                #         self.current_token_number = 1
-                #     if self.current_token_number == 4:
-                #         self.total_shedding_load += float(token.value)
-                #     self.current_token_number += 1
-                # # Section 4
-                # elif self.current_section == 4:
-                #     self.total_tripped_generators += 1
+                    if count == 1:
+                        #print("LAST: " + str(int(token.value)+(numlines*2)))
+                        self.update_matrix(self.matrix_map[key], int(token.value)+(numlines*2), 1)
+                        count += 1
+                    else:
+                        if count == 3:
+                            count = 1
+                        else:
+                            count += 1
                 elif self.current_section == 5:
                     current_replication = int(token.value)
 
         self.reset()
         self.print_matrix()
+
+
         # self.encoded_matrix[1][232] = 7
         # print(self.encoded_matrix[1][232])
         # outfile = "matrix.txt"
@@ -215,8 +234,30 @@ class Processor:
         # outfile = "matrix.txt"
         # dmatrix.tofile(outfile, sep=" ", format="%s")
 
-    def update_matrix(self, matrix, row, col, value):
-        matrix[row][col] = value
+    def build_matrix_map(self):
+        #((1, 3), 1) : 1
+        total_count = 0
+        temp_count = 1
+        plan = 0
+        length = len(self.hardening_plans)
+        total = length * self.total_replications
+        keys = list(self.hardening_plans.keys())
+        # key = tuple([keys[0], 1])
+        # print(key)
+
+        while total_count < total:
+            if temp_count == self.total_replications+1:
+                plan += 1
+                temp_count = 1
+            key = tuple([keys[plan], temp_count])
+            self.matrix_map[key] = total_count
+            total_count += 1
+            temp_count += 1
+
+        #print(self.matrix_map)
+
+    def update_matrix(self, row, col, value):
+        self.encoded_matrix[row][col] = value
 
     def print_matrix(self):
         # self.encoded_matrix[1][232] = 7
@@ -288,12 +329,6 @@ class Processor:
 
     def add_plan(self, plan, replication):
         plan_key = tuple(plan)
-
-        # if(plan_key in self.hardening_plans):
-        #     temp = self.hardening_plans[plan_key]
-        #     temp = replication
-        #     self.hardening_plans[plan_key] = temp
-        # else:
         self.hardening_plans[plan_key] = replication
         return plan_key
 

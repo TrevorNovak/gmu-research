@@ -29,7 +29,7 @@ def print_summary(logs, outfiles, flag):
 
     count = 1
     if logs:
-        print("\nLogs that were analyed: ")
+        print("\nLogs that were analyzed: ")
         for log in logs:
             print(str(count) + ":  " + str(log))
             count += 1
@@ -48,7 +48,7 @@ def print_summary(logs, outfiles, flag):
     print("\n")
 
 def main(args):
-    outfiles = [args.o]
+    outfiles = [args.o, "matrix.txt"]
     infile = "linemap.csv"
     myanalyzer = Analyzer()
     text = ""
@@ -78,7 +78,7 @@ def main(args):
         for log in logs:
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
-    if logs and len(outfiles) == 1:
+    if logs and len(outfiles) > 0:
         myanalyzer.run(text, outfiles[0], infile, args.v)
         print_summary(logs, outfiles, 'SUCCESS')
     else:
