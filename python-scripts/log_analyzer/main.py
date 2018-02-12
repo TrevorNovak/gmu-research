@@ -6,7 +6,10 @@ import glob
 
 
 def parse_command():
-
+    """
+    Parses the command line arguments passed in with main.py which are used to
+    drive behavior and/or values of the program.
+    """
     if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Generate new branch file.')
         parser.add_argument('-o', type=str, nargs='?', default='output.csv',
@@ -22,6 +25,9 @@ def parse_command():
         main(args)
 
 def print_summary(logs, outfiles, flag):
+    """
+    Prints an output summary based on the analysis that was performed.
+    """
     width = 38
     print("\n\n********** ANALYSIS SUMMARY **********")
 
@@ -48,6 +54,9 @@ def print_summary(logs, outfiles, flag):
     print("\n")
 
 def main(args):
+    """
+    Main function used to coordinate component pieces. Drives the program.
+    """
     outfiles = [args.o, "matrix.txt"]
     infile = "linemap.csv"
     myanalyzer = Analyzer()
