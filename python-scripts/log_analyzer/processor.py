@@ -41,7 +41,7 @@ class Processor:
             #self.print_line_map()
 
         if flag2 == 1:
-            self.first_process(token_collection_list, outfile, flag1)
+            self.csv_process(token_collection_list, outfile, flag1)
             self.matrix_process(token_collection_list)
 
     def build_line_map(self, infile):
@@ -64,14 +64,14 @@ class Processor:
         for entry in self.line_map:
             print(str(entry) + " = " + str(self.line_map[entry]))
 
-    def first_process(self, token_collection, filename, flag1):
+    def csv_process(self, token_collection, filename, flag1):
         current_replication = 0
 
         for token in token_collection:
             if flag1:
                 print(token)
             if token.type == 'HEADER':
-                self.process_header(token, current_replication)
+                self.csv_process_header(token, current_replication)
             elif token.type == 'COLUMN':
                 pass
             elif token.type == 'DATA':
@@ -82,19 +82,19 @@ class Processor:
 
                 # Section 1
                 if self.current_section == 1:                        # Initial Tripped
-                    self.process_section_one(token)
+                    self.csv_process_section_one(token)
                 # Section 2
                 elif self.current_section == 2:
-                    self.process_section_two(token)
+                    self.csv_process_section_two(token)
                 # Section 3
                 elif self.current_section == 3:
-                    self.process_section_three(token)
+                    self.csv_process_section_three(token)
                 # Section 4
                 elif self.current_section == 4:
-                    self.process_section_four()
+                    self.csv_process_section_four()
                 # Section 5
                 elif self.current_section == 5:
-                    current_replication = self.process_section_five(token)
+                    current_replication = self.csv_process_section_five(token)
             else:
                 print("Nothing")
 
@@ -104,14 +104,14 @@ class Processor:
         #print(len(self.line_map))
         self.write_to_csv(filename)
 
-    def process_header(self, token, current_replication):
+    def csv_process_header(self, token, current_replication):
         self.isReinforced = -1
         self.current_section = self.get_section(token)
         if self.current_section == 5:
             if len(self.plans) > 0:
                 self.store_and_reset(current_replication)
 
-    def process_section_one(self, token):
+    def csv_process_section_one(self, token):
         if self.current_token_number > self.TOTAL_COL:
             self.current_token_number = 1
         if self.current_token_number == 1:               # LineNum token
@@ -127,23 +127,23 @@ class Processor:
         else:
             self.current_token_number += 1               # No match
 
-    def process_section_two(self, token):
+    def csv_process_section_two(self, token):
         next_line = int(token.line)
         if next_line > self.curr_line:
             self.curr_line = next_line
             self.total_tripped += 1
 
-    def process_section_three(self, token):
+    def csv_process_section_three(self, token):
         if self.current_token_number > 4:
             self.current_token_number = 1
         if self.current_token_number == 4:
             self.total_shedding_load += float(token.value)
         self.current_token_number += 1
 
-    def process_section_four(self):
+    def csv_process_section_four(self):
         self.total_tripped_generators += 1
 
-    def process_section_five(self, token):
+    def csv_process_section_five(self, token):
         current_replication = int(token.value)
         if current_replication > self.total_replications:
             self.total_replications = current_replication
@@ -224,7 +224,7 @@ class Processor:
                     current_replication = int(token.value)
 
         self.reset()
-        self.print_matrix()
+        self.print_matrix("matrix.txt")
 
 
         # self.encoded_matrix[1][232] = 7
@@ -259,10 +259,9 @@ class Processor:
     def update_matrix(self, row, col, value):
         self.encoded_matrix[row][col] = value
 
-    def print_matrix(self):
+    def print_matrix(self, outfile):
         # self.encoded_matrix[1][232] = 7
         # print(self.encoded_matrix[1][232])
-        outfile = "matrix.txt"
         with open(outfile, "w") as f:
             for line in self.encoded_matrix:
                 listline = str(line)
