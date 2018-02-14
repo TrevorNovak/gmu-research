@@ -58,7 +58,7 @@ def main(args):
     Main function used to coordinate component pieces. Drives the program.
     """
     outfiles = [args.o, "matrix.txt"]
-    infile = "linemap.csv"
+    infile = "input_files/linemap.csv"
     myanalyzer = Analyzer()
     text = ""
     logs = []

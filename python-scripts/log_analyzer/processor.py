@@ -36,7 +36,7 @@ class Processor:
         """
         flag2 = 1
         token_collection_list = []
-        self.read_config_file("config.txt")
+        self.read_config_file("input_files/config.txt")
 
         for token in token_collection:
             token_collection_list.append(token)
@@ -247,7 +247,7 @@ class Processor:
                     current_replication = int(token.value)
 
         self.reset()
-        self.print_matrix("matrix.txt")
+        self.print_matrix("output_files/matrix.txt")
 
 
         # self.encoded_matrix[1][232] = 7
