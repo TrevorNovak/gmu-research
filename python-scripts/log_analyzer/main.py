@@ -72,13 +72,13 @@ def main(args):
         i = start
         for log in temp_logs:
             for i in range(start, end):
-                if re.match('[a-zA-Z _]+_'+str(i)+'.txt', str(log)):
+                if re.match('[a-zA-Z _-]+_'+str(i)+'.txt', str(log)):
                     logs.append(log)
     elif args.l:
         numbers = args.l.split()
         for log in temp_logs:
             for number in numbers:
-                if re.match('[a-zA-Z _]+_'+number+'.txt', str(log)):
+                if re.match('[a-zA-Z _-]+_'+number+'.txt', str(log)):
                     logs.append(log)
     else:
         logs = temp_logs
@@ -88,7 +88,7 @@ def main(args):
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
     if logs and len(outfiles) > 0:
-        myanalyzer.run(text, outfiles[0], infile, args.v)
+        myanalyzer.run(text, outfiles, infile, args.v)
         print_summary(logs, outfiles, 'SUCCESS')
     else:
         print_summary(logs, outfiles, 'FAILURE')

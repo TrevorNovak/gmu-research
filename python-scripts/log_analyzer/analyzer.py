@@ -12,6 +12,6 @@ class Analyzer:
             log = f.read()
             return str(log)
 
-    def run(self, text, outfile, infile, flag):
+    def run(self, text, outfiles, infiles, flag):
         token_collection = self.tokenizer.tokenize(text)
-        self.processor.process(token_collection, outfile, infile, flag)
+        self.processor.process(token_collection, outfiles, infiles, flag)

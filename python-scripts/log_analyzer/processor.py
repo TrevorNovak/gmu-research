@@ -29,7 +29,7 @@ class Processor:
         self.plans = [ ]
         self.encoded_matrix = [ ]
 
-    def process(self, token_collection, outfile, infile, flag1):
+    def process(self, token_collection, outfiles, infiles, flag1):
         """
         Main processing function for entire analyzer. Orchaestrates smaller
         processing functions such as csv_process() and matrix_process().
@@ -41,13 +41,13 @@ class Processor:
         for token in token_collection:
             token_collection_list.append(token)
 
-        if infile:
-            self.build_line_map(infile)
-            #self.print_line_map()
+        # if infiles:
+        #     self.build_line_map(infiles[1])
+        #     #self.print_line_map()
 
         if flag2 == 1:
-            self.csv_process(token_collection_list, outfile, flag1)
-            self.matrix_process(token_collection_list)
+            self.csv_process(token_collection_list, "output_files/"+outfiles[0], flag1)
+            self.matrix_process(token_collection_list, "output_files/"+outfiles[1])
 
     def csv_process(self, token_collection, filename, flag1):
         """
@@ -167,7 +167,7 @@ class Processor:
             self.total_replications = current_replication
         return current_replication
 
-    def matrix_process(self,token_collection):
+    def matrix_process(self,token_collection, outfile):
         """
         Main processing function for generating sparse matrix output.
         Orchaestrates smaller processing functions for each log section (currently five + header).
@@ -247,7 +247,7 @@ class Processor:
                     current_replication = int(token.value)
 
         self.reset()
-        self.print_matrix("output_files/matrix.txt")
+        self.print_matrix(outfile)
 
 
         # self.encoded_matrix[1][232] = 7
@@ -349,7 +349,7 @@ class Processor:
         Writes the csv header and csv_rows list to a csv file. This is the final
         output.
         """
-        with open(filename, 'w') as csvfile:
+        with open(filename, 'w', newline='') as csvfile:
             filewriter = csv.writer(csvfile)
             column_header = self.build_csv_header()
             filewriter.writerow(column_header)

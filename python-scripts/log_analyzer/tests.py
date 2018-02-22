@@ -13,7 +13,5 @@ class TestProcessorMethods(unittest.TestCase):
         p.build_matrix(3, 4)
         self.assertNotEqual(p.encoded_matrix, [[0,0,0],[0,0,0],[0,0,0]])
 
-
-
 if __name__ == '__main__':
     unittest.main()
