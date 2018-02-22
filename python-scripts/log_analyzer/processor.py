@@ -3,6 +3,7 @@ import re
 import csv
 import copy
 import numpy as np
+import os
 from strings import *
 
 class Processor:
@@ -46,8 +47,8 @@ class Processor:
         #     #self.print_line_map()
 
         if flag2 == 1:
-            self.csv_process(token_collection_list, "output_files/"+outfiles[0], flag1)
-            self.matrix_process(token_collection_list, "output_files/"+outfiles[1])
+            self.csv_process(token_collection_list, os.path.join('output_files', outfiles[0]), flag1)
+            self.matrix_process(token_collection_list, os.path.join('output_files', outfiles[1]))
 
     def csv_process(self, token_collection, filename, flag1):
         """
