@@ -25,7 +25,9 @@ The default output file is *output.csv*, however, you can specify an output file
 
 3. **Input File**: 
 
-The default input method is to scan the directory of the program and read all files which match the format *filename_#.txt*. However, there are two additional ways to specify file inputs, either as a range or a list.
+The default input method is to scan the directory of the program and read all files which match the format *filename_#.txt (e.g. cas_results_#.txt)*. 
+
+The regular expression is '[a-zA-Z_ -]+_[0-9]+.txt' which matches any combination of letters, numbers, spaces hyphens, and underscores so long as the end of the filename consists of an underscore, followed by a number, and the extension .txt). However, there are two additional ways to specify file inputs, either as a range or a list.
 
    - **Range**
 
