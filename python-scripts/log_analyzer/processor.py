@@ -220,6 +220,7 @@ class Processor:
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
                         key = tuple([keys[current_plan-1], current_replication])
+                        print(key)
                         #print(self.current_line_number+numlines)
                         self.update_matrix(self.matrix_map[key], self.current_line_number+numlines, 1)
                     elif self.current_token_number == 5:             # Check if Hardened
@@ -247,8 +248,11 @@ class Processor:
                 elif self.current_section == 5:
                     current_replication = int(token.value)
 
+        print(self.matrix_map)
+        # print(self.encoded_matrix)
         self.reset()
         self.print_matrix(outfile)
+        self.print_matrix_csv("matrix.csv", numlines)
 
 
         # self.encoded_matrix[1][232] = 7
@@ -288,12 +292,62 @@ class Processor:
     def update_matrix(self, row, col, value):
         self.encoded_matrix[row][col] = value
 
+    def print_matrix_csv(self, outfile, numlines):
+        """
+        Writes the csv header and csv_rows list to a csv file. This is the final
+        output.
+        """
+    # with open(filename, 'w', newline='') as csvfile:
+    #     filewriter = csv.writer(csvfile)
+    #     column_header = self.build_csv_header()
+    #     filewriter.writerow(column_header)
+    #     for row in self.csv_rows:
+    #         filewriter.writerow(row)
+        with open(outfile, 'w', newline='') as csvfile:
+            filewriter = csv.writer(csvfile)
+            column_header = self.build_matrixcsv_header(numlines)
+            filewriter.writerow(column_header)
+            for row in self.encoded_matrix:
+                filewriter.writerow(row)
+
+    ## NOTES FOR TOMORROW
+    ## Either sort() matrix before printout if he wants hardening plan and reps together,
+    ## or we print rep 1 hardening plans, rep 2 hardening plans, then rep 3 hardening plans.
+    ## Ask about headers.
+    
+    def build_matrixcsv_header(self, numlines):
+        """
+        Builds the csv_header based on output requirements.
+        """
+        col_list = []
+        matrix = self.encoded_matrix.sort()
+        for i in range(3*numlines):
+            col_list.append(i)
+
+        # for i in range(1, numlines):
+        #     col_list.append(i)
+        #
+        # for i in range(1, numlines):
+        #     col_list.append(i)
+
+        # col_list.append('Total Initial Tripped Lines')
+        # col_list.append('Total Tripped Lines')
+        # col_list.append('Total Shedding Load Amount')
+        # col_list.append('Total Tripped Generators')
+        # col_list.append('Replication Index')
+
+        return col_list
+
+
     def print_matrix(self, outfile):
         # self.encoded_matrix[1][232] = 7
         # print(self.encoded_matrix[1][232])
+        # for row in self.encoded_matrix:
+        #     print(row)
+        matrix = self.encoded_matrix.sort()
         with open(outfile, "w") as f:
-            for line in self.encoded_matrix:
-                listline = str(line)
+            for row in self.encoded_matrix:
+                listline = str(row)
                 listline = listline.replace("[", "")
                 listline = listline.replace("]", "\n")
                 templine = listline.replace(",", " ")
