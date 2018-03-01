@@ -187,7 +187,7 @@ class Processor:
         col = 3*numlines
         #print("Row: " + str(row) + " Col: " + str(col) + "Hard: " + str(len(self.hardening_plans)))
         #print(self.hardening_plans)
-        self.build_matrix(row, col)
+        self.build_matrix(row, col+1)
 
         count = 1
 
@@ -220,8 +220,9 @@ class Processor:
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
                         key = tuple([keys[current_plan-1], current_replication])
-                        print(key)
+                        # print(key)
                         #print(self.current_line_number+numlines)
+                        self.update_matrix(self.matrix_map[key], 0, current_replication)
                         self.update_matrix(self.matrix_map[key], self.current_line_number+numlines, 1)
                     elif self.current_token_number == 5:             # Check if Hardened
                         self.isReinforced = int(token.value)
@@ -229,7 +230,7 @@ class Processor:
                             line = 0
                             key = tuple([keys[current_plan-1], current_replication])
                             #print(self.matrix_map[key])
-                            self.update_matrix(self.matrix_map[key], self.current_line_number-1, 1)
+                            self.update_matrix(self.matrix_map[key], self.current_line_number, 1)
                         self.current_token_number += 1
 
                     else:
@@ -248,11 +249,11 @@ class Processor:
                 elif self.current_section == 5:
                     current_replication = int(token.value)
 
-        print(self.matrix_map)
+        # print(self.matrix_map)
         # print(self.encoded_matrix)
         self.reset()
         self.print_matrix(outfile)
-        self.print_matrix_csv("matrix.csv", numlines)
+        self.print_matrix_csv("output_files/matrix.csv", numlines)
 
 
         # self.encoded_matrix[1][232] = 7
@@ -297,12 +298,6 @@ class Processor:
         Writes the csv header and csv_rows list to a csv file. This is the final
         output.
         """
-    # with open(filename, 'w', newline='') as csvfile:
-    #     filewriter = csv.writer(csvfile)
-    #     column_header = self.build_csv_header()
-    #     filewriter.writerow(column_header)
-    #     for row in self.csv_rows:
-    #         filewriter.writerow(row)
         with open(outfile, 'w', newline='') as csvfile:
             filewriter = csv.writer(csvfile)
             column_header = self.build_matrixcsv_header(numlines)
@@ -310,11 +305,6 @@ class Processor:
             for row in self.encoded_matrix:
                 filewriter.writerow(row)
 
-    ## NOTES FOR TOMORROW
-    ## Either sort() matrix before printout if he wants hardening plan and reps together,
-    ## or we print rep 1 hardening plans, rep 2 hardening plans, then rep 3 hardening plans.
-    ## Ask about headers.
-    
     def build_matrixcsv_header(self, numlines):
         """
         Builds the csv_header based on output requirements.
@@ -344,9 +334,10 @@ class Processor:
         # print(self.encoded_matrix[1][232])
         # for row in self.encoded_matrix:
         #     print(row)
-        matrix = self.encoded_matrix.sort()
+        #matrix = self.encoded_matrix.sort()
         with open(outfile, "w") as f:
             for row in self.encoded_matrix:
+                # print(self.encoded_matrix[row][column])
                 listline = str(row)
                 listline = listline.replace("[", "")
                 listline = listline.replace("]", "\n")
