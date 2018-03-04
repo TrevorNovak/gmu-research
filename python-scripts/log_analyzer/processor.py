@@ -5,6 +5,7 @@ import copy
 import numpy as np
 import os
 from strings import *
+from util import *
 
 class Processor:
 
@@ -26,6 +27,7 @@ class Processor:
         self.hardening_plans = { }
         self.line_map = { }
         self.matrix_map = { }
+        self.config_values = { }
         self.csv_rows = []
         self.plans = [ ]
         self.encoded_matrix = [ ]
@@ -37,7 +39,7 @@ class Processor:
         """
         flag2 = 1
         token_collection_list = []
-        self.read_config_file("input_files/config.txt")
+        self.config_values = read_config_file("input_files/config.txt")
 
         for token in token_collection:
             token_collection_list.append(token)
@@ -176,7 +178,7 @@ class Processor:
         """
         #numlines = len(self.line_map)
         self.build_matrix_map()
-        numlines = 233
+        numlines = int(self.config_values[NUMLINES])
         current_replication = 0
         rep_count = 0
         current_plan = 0
@@ -188,6 +190,7 @@ class Processor:
         #print("Row: " + str(row) + " Col: " + str(col) + "Hard: " + str(len(self.hardening_plans)))
         #print(self.hardening_plans)
         self.build_matrix(row, col+1)
+        print(len(keys))
 
         count = 1
 
@@ -219,6 +222,7 @@ class Processor:
                     if self.current_token_number == 1:               # LineNum token
                         self.current_line_number = int(token.value)  # Save LineNum
                         self.current_token_number += 1
+                        # print(current_plan)
                         key = tuple([keys[current_plan-1], current_replication])
                         # print(key)
                         #print(self.current_line_number+numlines)
@@ -249,19 +253,14 @@ class Processor:
                 elif self.current_section == 5:
                     current_replication = int(token.value)
 
-        # print(self.matrix_map)
-        # print(self.encoded_matrix)
         self.reset()
-        self.print_matrix(outfile)
-        self.print_matrix_csv("output_files/matrix.csv", numlines)
-
-
-        # self.encoded_matrix[1][232] = 7
-        # print(self.encoded_matrix[1][232])
-        # outfile = "matrix.txt"
-        # dmatrix = np.matrix(smatrix)
-        # outfile = "matrix.txt"
-        # dmatrix.tofile(outfile, sep=" ", format="%s")
+        if str(self.config_values[DELIMITER]) == "sp":
+            self.print_matrix(outfile)
+        elif str(self.config_values[DELIMITER]) == ",":
+            self.print_matrix_csv("output_files/matrix.csv", numlines)
+        else:
+            self.print_matrix(outfile)
+            self.print_matrix_csv("output_files/matrix.csv", numlines)
 
     def build_matrix_map(self):
         """
@@ -311,42 +310,29 @@ class Processor:
         """
         col_list = []
         matrix = self.encoded_matrix.sort()
-        for i in range(3*numlines):
-            col_list.append(i)
+        col_list.append("Replication")
+        for i in range(numlines):
+            col_list.append("HLI_"+str(i+1))
 
-        # for i in range(1, numlines):
-        #     col_list.append(i)
-        #
-        # for i in range(1, numlines):
-        #     col_list.append(i)
+        for i in range(numlines):
+            col_list.append("ITL_"+str(i+1))
 
-        # col_list.append('Total Initial Tripped Lines')
-        # col_list.append('Total Tripped Lines')
-        # col_list.append('Total Shedding Load Amount')
-        # col_list.append('Total Tripped Generators')
-        # col_list.append('Replication Index')
+        for i in range(numlines):
+            col_list.append("TTL_"+str(i+1))
 
         return col_list
 
 
     def print_matrix(self, outfile):
-        # self.encoded_matrix[1][232] = 7
-        # print(self.encoded_matrix[1][232])
-        # for row in self.encoded_matrix:
-        #     print(row)
-        #matrix = self.encoded_matrix.sort()
         with open(outfile, "w") as f:
             for row in self.encoded_matrix:
-                # print(self.encoded_matrix[row][column])
                 listline = str(row)
                 listline = listline.replace("[", "")
                 listline = listline.replace("]", "\n")
                 templine = listline.replace(",", " ")
                 f.write(templine)
-                # f.write("end")
 
     def build_matrix(self, row, col):
-        # Build matrix using list comprehension
         self.encoded_matrix = [[0 for x in range(col)] for y in range(row)]
 
     def store_and_reset(self, replication):
@@ -453,19 +439,9 @@ class Processor:
                 temp_key.append(line[2])                # Get "To" bus
                 key = tuple(temp_key)                   # Use "From" and "To" as hashmap key
                 value = line[0]                         # Use line num as value in hashmap
-                # if key in self.line_map:
-                #     print("Current Line: " + str(value) +  " Line: " + str(self.line_map[key])+ " Key: " + str(key))
-
                 self.line_map[key] = value
                 temp_key = []
 
     def print_line_map(self):
         for entry in self.line_map:
             print(str(entry) + " = " + str(self.line_map[entry]))
-
-    def read_config_file(self, conf):
-        pattern = r"[a-zA-Z0-9 _-]+="
-
-        with open(conf, 'r') as config:
-            values = config.read()
-        return values

@@ -18,6 +18,13 @@ TRIP_HEADER = TRIPPED_LINES
 HARDEN_COLUMN = REINFORCE
 REP_COUNT = REPLICATION_COUNT
 
+#Config Strings
+NUMLINES = 'numlines'
+RANGE = 'range'
+LIST = 'list'
+DELIMITER = 'delimiter'
+VERBOSE = 'verbose'
+
 # Section Map
 total_sections = 5
 section_table = {
