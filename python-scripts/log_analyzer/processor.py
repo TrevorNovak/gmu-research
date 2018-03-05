@@ -4,6 +4,7 @@ import csv
 import copy
 import numpy as np
 import os
+import sys
 from strings import *
 from util import *
 
@@ -32,14 +33,17 @@ class Processor:
         self.plans = [ ]
         self.encoded_matrix = [ ]
 
-    def process(self, token_collection, outfiles, infiles, flag1):
+    def process(self, token_collection, outfiles, infiles, config_values, flag1):
         """
         Main processing function for entire analyzer. Orchaestrates smaller
         processing functions such as csv_process() and matrix_process().
         """
         flag2 = 1
         token_collection_list = []
-        self.config_values = read_config_file("input_files/config.txt")
+        self.config_values = config_values
+        if self.config_values[NUMLINES] == "":
+            print("You forgot to specify the number of lines in the config file. Please try again.")
+            sys.exit(0)
 
         for token in token_collection:
             token_collection_list.append(token)
@@ -176,19 +180,14 @@ class Processor:
         Orchaestrates smaller processing functions for each log section (currently five + header).
         Currently, code is not broken up into smaller functions. That is on todo list.
         """
-        #numlines = len(self.line_map)
         self.build_matrix_map()
         numlines = int(self.config_values[NUMLINES])
         current_replication = 0
         rep_count = 0
         current_plan = 0
         keys = list(self.hardening_plans.keys())
-        #print("KEYS")
-        #print(keys)
         row = len(self.hardening_plans)*self.total_replications
         col = 3*numlines
-        #print("Row: " + str(row) + " Col: " + str(col) + "Hard: " + str(len(self.hardening_plans)))
-        #print(self.hardening_plans)
         self.build_matrix(row, col+1)
         print(len(keys))
 
@@ -261,6 +260,80 @@ class Processor:
         else:
             self.print_matrix(outfile)
             self.print_matrix_csv("output_files/matrix.csv", numlines)
+
+    def matrix_process_header(self, token, current_replication):
+        """
+        Function used to determine how to process header tokens for csv file
+        output.
+        """
+        self.isReinforced = -1
+        self.current_section = self.get_section(token)
+        if self.current_section == 5:
+            if len(self.plans) > 0:
+                self.store_and_reset(current_replication)
+
+    def matrix_process_section_one(self, token):
+        """
+        Function used to determine how to process section one data tokens for
+        csv file output. Section one tells us which lines are reinforced and
+        which lines were inititally tripped.
+        """
+        if self.current_token_number > self.TOTAL_COL:
+            self.current_token_number = 1
+        if self.current_token_number == 1:               # LineNum token
+            self.current_line_number = int(token.value)  # Save LineNum
+            self.current_token_number += 1
+        elif self.current_token_number == 5:             # Check if Hardened
+            self.isReinforced = int(token.value)
+            if self.isReinforced == 1:                   # If Line Hardened
+                self.plans.append(self.current_line_number)   # Add to plan
+            else:
+                self.total_initial_tripped += 1          # Otherwise failed
+            self.current_token_number += 1
+        else:
+            self.current_token_number += 1               # No match
+
+    def matrix_process_section_two(self, token):
+        """
+        Function used to determine how to process section two data tokens for
+        csv file output. Section two tells us which lines are tripped after
+        cascading power failure is complete. For csv output, we simply need to
+        know how many.
+        """
+        next_line = int(token.line)
+        if next_line > self.curr_line:
+            self.curr_line = next_line
+            self.total_tripped += 1
+
+    def matrix_process_section_three(self, token):
+        """
+        Function used to determine how to process section three data tokens for
+        csv file output. Section three tell us shedding load for a given bus. We
+        use this information to calculate total load shedding.
+        """
+        if self.current_token_number > 4:
+            self.current_token_number = 1
+        if self.current_token_number == 4:
+            self.total_shedding_load += float(token.value)
+        self.current_token_number += 1
+
+    def matrix_process_section_four(self):
+        """
+        Function used to determine how to process section four data tokens for
+        csv file output. Section four tells us which generators tripped. For csv
+        processing, we simply want to know how many.
+        """
+        self.total_tripped_generators += 1
+
+    def matrix_process_section_five(self, token):
+        """
+        Function used to determine how to process section five data tokens for
+        csv file output. Section five tells us the replication index.
+        """
+        current_replication = int(token.value)
+        if current_replication > self.total_replications:
+            self.total_replications = current_replication
+        return current_replication
 
     def build_matrix_map(self):
         """
@@ -422,7 +495,6 @@ class Processor:
         line = str(token.value)
         section_text = re.sub(myregex, '', line)
         section_text = section_text.strip()
-        #print(section_text)
         return section_table[section_text]
 
     def build_line_map(self, infile):

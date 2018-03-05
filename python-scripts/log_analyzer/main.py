@@ -1,4 +1,5 @@
 from analyzer import *
+from util import *
 import re
 import sys
 import argparse
@@ -62,6 +63,7 @@ def main(args):
     myanalyzer = Analyzer()
     text = ""
     logs = []
+    config_values = read_config_file("input_files/config.txt")
 
     temp_logs = [log for log in glob.glob("*.txt") if re.match('[a-zA-Z _]+_[0-9]+.txt', str(log))]
     temp_logs.sort()
@@ -80,6 +82,21 @@ def main(args):
             for number in numbers:
                 if re.match('[a-zA-Z _-]+_'+number+'.txt', str(log)):
                     logs.append(log)
+    elif config_values[RANGE] != "":
+        ranges = config_values[RANGE].split(" ")
+        start = int(ranges[0])
+        end = int(ranges[1])
+        i = start
+        for log in temp_logs:
+            for i in range(start, end):
+                if re.match('[a-zA-Z _-]+_'+str(i)+'.txt', str(log)):
+                    logs.append(log)
+    elif config_values[LIST] != "":
+        numbers = config_values[LIST].split()
+        for log in temp_logs:
+            for number in numbers:
+                if re.match('[a-zA-Z _-]+_'+number+'.txt', str(log)):
+                    logs.append(log)
     else:
         logs = temp_logs
 
@@ -88,7 +105,7 @@ def main(args):
             text += myanalyzer.read(log)    # Build text string for tokenizer
 
     if logs and len(outfiles) > 0:
-        myanalyzer.run(text, outfiles, infile, args.v)
+        myanalyzer.run(text, outfiles, infile, config_values, args.v)
         print_summary(logs, outfiles, 'SUCCESS')
     else:
         print_summary(logs, outfiles, 'FAILURE')

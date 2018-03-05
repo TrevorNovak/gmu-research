@@ -1,5 +1,5 @@
 import unittest
-from processor import *
+from .processor import *
 
 class TestProcessorMethods(unittest.TestCase):
 

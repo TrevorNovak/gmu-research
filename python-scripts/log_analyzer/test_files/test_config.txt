@@ -1,0 +1,5 @@
+numlines=42
+range=1 10
+list=1 2 3 4
+delimiter=,
+verbose=0
