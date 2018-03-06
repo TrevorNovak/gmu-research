@@ -70,19 +70,19 @@ delimiter=
 
 verbose=
 
-### Numlines:
+#### Numlines:
 
 Specify the number of lines (e.g. 233 lines): `numlines=233` 
 
-### Range:
+#### Range:
 
 Specify the range of files you wish to process (e.g. 1 through 10): `range=1 10`
 
-### List:
+#### List:
 
 Specify a lost of files you wish to process (e.g. 1, 2, 4, 9): `list=1,2,4,9`
 
-### Delimiter:
+#### Delimiter:
 
 Specifies which type of matrix delimiter output you prefer (comma separated value or white space). 
 
