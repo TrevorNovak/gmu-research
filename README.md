@@ -55,13 +55,18 @@ In order to specify a list simply use the `-l` argument followed by the list of 
 
 `python3 main.py -l "1 3 5 129"`
 
-##Config File
+
+## Config File
 
 In addition to passing in command line arguments, it is also possible to specify the same information inside of a config file. The file is located in `/input_files/config.txt`. 
 
 `numlines=233
+
 range=
+
 list=
+
 delimiter=
+
 verbose=
 `
