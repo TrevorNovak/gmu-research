@@ -58,9 +58,9 @@ In order to specify a list simply use the `-l` argument followed by the list of 
 
 ## Config File
 
-In addition to passing in command line arguments, it is also possible to specify the same information inside of a config file. The file is located in `/input_files/config.txt`. 
+In addition to passing in command line arguments, it is also possible to specify the same information inside of a config file. The file is located in `/input_files/config.txt`. `numlines` can never be left blank. It is always required. All other fields can be left blank and will use their default values.
 
-`numlines=233
+numlines=
 
 range=
 
@@ -69,4 +69,28 @@ list=
 delimiter=
 
 verbose=
-`
+
+###Numlines:
+
+Specify the number of lines (e.g. 233 lines): `numlines=233` 
+
+###Range:
+
+Specify the range of files you wish to process (e.g. 1 through 10): `range=1 10`
+
+###List:
+
+Specify a lost of files you wish to process (e.g. 1, 2, 4, 9): `list=1,2,4,9`
+
+###Delimiter:
+
+Specifies which type of matrix delimiter output you prefer (comma separated value or white space). 
+
+For comma separated value (complete with csv headers): `delimiter=,`
+
+For white space (no headers): `delimiter=sp`
+
+If delimiter is left blank, it will output both matrix types.
+
+
+
