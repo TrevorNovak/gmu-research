@@ -92,5 +92,11 @@ For white space (no headers): `delimiter=sp`
 
 If delimiter is left blank, it will output both matrix types.
 
+## Matrix Output
 
+In addition to printing out an analytics csv file, the log analyzer is also capable of producing a matrix output, either as a csv or as a whitespace delimited matrix. This section will describe the format of the matrix output.
+
+Each row in the matrix has an associated key, consisting of a hardening plan, and its replication index. For example if we have the hardening plan (3, 25) implying lines 3 and 25 are hardened, and its replication index is 1, the associated key is ((3,25),1).
+
+Any given matrix will consist of 3k+1 columns, where k is the number of lines and 1 additional column is reserved for the replication index. The first k columns are line numbers 1..n, where a 1 indicates that particular line number is a member of the hardening plan, and 0 indicates that it is not. 
 
