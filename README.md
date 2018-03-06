@@ -5,6 +5,10 @@ A code repository for Dr. Jie Xu's Power Systems Optimization Research.
 
   The log analyzer is a tool used to tokenize, process, and analyze simulation log files. The results are printed to a .csv file. 
   
+To run the analyzer:
+
+`python3 main.py`
+  
 ### Command Line Arguments:
 
 1. **Verbose**: 
@@ -50,3 +54,14 @@ In order to specify a list simply use the `-l` argument followed by the list of 
 #### Example:
 
 `python3 main.py -l "1 3 5 129"`
+
+##Config File
+
+In addition to passing in command line arguments, it is also possible to specify the same information inside of a config file. The file is located in `/input_files/config.txt`. 
+
+`numlines=233
+range=
+list=
+delimiter=
+verbose=
+`
