@@ -11,19 +11,18 @@ def parse_command():
     Parses the command line arguments passed in with main.py which are used to
     drive behavior and/or values of the program.
     """
-    if __name__ == '__main__':
-        parser = argparse.ArgumentParser(description='Generate new branch file.')
-        parser.add_argument('-o', type=str, nargs='?', default='output.csv',
-                            help='Provide an output file. Default is results.csv')
-        parser.add_argument('-r', type=int, nargs=2,
-                            help='Provide a range of files to process. E.g. "1 10" Default searches current directory for all "filename_#.txt" files')
-        parser.add_argument('-l', type=str, nargs='?',
-                            help='Provide a list of input files to analyze. Default searches current directory for all "filename_#.txt" files')
-        parser.add_argument('-v', type=int, nargs=1, default=0,
-                            help='Turns verbose output on. Prints all generated tokens.')
+    parser = argparse.ArgumentParser(description='Generate new branch file.')
+    parser.add_argument('-o', type=str, nargs='?', default='output.csv',
+                        help='Provide an output file. Default is results.csv')
+    parser.add_argument('-r', type=int, nargs=2,
+                        help='Provide a range of files to process. E.g. "1 10" Default searches current directory for all "filename_#.txt" files')
+    parser.add_argument('-l', type=str, nargs='?',
+                        help='Provide a list of input files to analyze. Default searches current directory for all "filename_#.txt" files')
+    parser.add_argument('-v', type=int, nargs=1, default=0,
+                        help='Turns verbose output on. Prints all generated tokens.')
 
-        args = parser.parse_args(sys.argv[1:])
-        main(args)
+    args = parser.parse_args(sys.argv[1:])
+    main(args)
 
 def print_summary(logs, outfiles, flag):
     """
@@ -110,4 +109,5 @@ def main(args):
     else:
         print_summary(logs, outfiles, 'FAILURE')
 
-parse_command()
+if __name__ == '__main__':
+    parse_command()
