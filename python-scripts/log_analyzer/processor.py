@@ -189,7 +189,7 @@ class Processor:
         row = len(self.hardening_plans)*self.total_replications
         col = 3*numlines
         self.build_matrix(row, col+1)
-        print(len(keys))
+        #print(len(keys))
 
         count = 1
 
