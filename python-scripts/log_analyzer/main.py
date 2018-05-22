@@ -59,12 +59,14 @@ def main(args):
     """
     outfiles = [args.o, "matrix.txt"]
     infile = "input_files/linemap.csv"
+    log_dir = 'log_directory/'
     myanalyzer = Analyzer()
     text = ""
     logs = []
     config_values = read_config_file("input_files/config.txt")
 
-    temp_logs = [log for log in glob.glob("*.txt") if re.match('[a-zA-Z _]+_[0-9]+.txt', str(log))]
+    temp_logs = [log for log in glob.glob(log_dir+'*.txt') if re.match(log_dir+'[a-zA-Z _]+_[0-9]+.txt', str(log))]
+    # temp_logs = [str(log) for log in glob.glob(log_dir)]
     temp_logs.sort()
 
     if args.r:
