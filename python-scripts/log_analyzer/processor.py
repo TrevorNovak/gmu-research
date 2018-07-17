@@ -2,7 +2,7 @@ import collections
 import re
 import csv
 import copy
-import numpy as np
+#import numpy as np
 import os
 import sys
 from strings import *

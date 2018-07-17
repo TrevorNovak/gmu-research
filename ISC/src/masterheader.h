@@ -1,0 +1,43 @@
+#ifndef MASTERHEADER_H_
+#define MASTERHEADER_H_
+
+
+#include <iostream> 
+#include "RngStream.h"
+#include <cmath>
+#include "Simulator.h"
+#include "myutilities.h"
+#include "Solution.h"
+#include "StoppingTest.h"
+#include "ReadInput.h"
+#include "Statistics.h"
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <ctime>
+#include "StatAlgorithm.h"
+#include "ISCControl.h"
+#include "cleanup.h"
+#include "ResponseSurface.h"
+//#include "NichingGAWTR.h"
+#include "ISCv3.h"
+//#include "NichePopulationWTR.h"
+#include "require.h"
+#include "RandomVariates.h"
+#include "DES.h"
+#include <typeinfo>
+#include <limits>
+#include <iterator> 
+#include <cassert>
+#include <algorithm>
+#include <list>
+#include <vector>
+#include "StoppingTest.h"
+#include "RMD.h"
+#include "mpr.h"
+#include "hyperbox.h"
+#include "SingularityCheck.h"
+#include "MatlabSim.h"
+#include "lp_lib.h"
+//#include "engine.h"  // Nov 11,2012  
+#endif /*MASTERHEADER_H_*/
