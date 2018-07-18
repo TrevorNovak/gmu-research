@@ -1,7 +1,12 @@
+import sys
+#print(sys.path)
+import os
+#print(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+#print(sys.path)
 from analyzer import *
 from util import *
 import re
-import sys
 import argparse
 import glob
 
@@ -58,17 +63,20 @@ def main(args):
     Main function used to coordinate component pieces. Drives the program.
     """
     outfiles = [args.o, "matrix.txt"]
-    infile = "input_files/linemap.csv"
-    log_dir = 'log_directory/'
+    infile = "./log_analyzer/input_files/linemap.csv"
+    log_dir = r'./simulation/'
+    print(os.path.abspath(log_dir))
+    print(log_dir)
     myanalyzer = Analyzer()
     text = ""
     logs = []
-    config_values = read_config_file("input_files/config.txt")
+    config_values = read_config_file("./log_analyzer/input_files/config.txt")
 
     temp_logs = [log for log in glob.glob(log_dir+'*.txt') if re.match(log_dir+'[a-zA-Z _]+_[0-9]+.txt', str(log))]
     # temp_logs = [str(log) for log in glob.glob(log_dir)]
     temp_logs.sort()
 
+    print(temp_logs)
     if args.r:
         start = args.r[0]
         end = args.r[1]+1

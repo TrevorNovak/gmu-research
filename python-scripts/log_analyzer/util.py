@@ -1,4 +1,5 @@
 def read_config_file(conf):
+    print(conf)
     values = {}
     try:
         with open(conf, 'r') as config:

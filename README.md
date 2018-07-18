@@ -100,3 +100,17 @@ Each row in the matrix has an associated key, consisting of a hardening plan, an
 
 Any given matrix will consist of 3k+1 columns, where k is the number of lines and 1 additional column is reserved for the replication index. The first k columns are line numbers 1..n, where a 1 indicates that particular line number is a member of the hardening plan, and 0 indicates that it is not. 
 
+## Aggregator
+
+This is a script used to parse the LoadShedding csv files which are outputted from the simulation and merge all of the results into a sorted list. 
+
+## ISC
+
+This is the source code which will determine inputs for the simulator and interpret the results of the log_analyzer
+
+## Makfile
+
+This is a sample Makefile which can be used with some modificatin to build the ISC source code. You will need a few other libraries. You will need the following libraries.
+
+lp_solve_5.1
+
